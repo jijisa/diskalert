@@ -7,9 +7,13 @@ name = "diskalert"
 version = "0.0.1"
 description = "Disk Alert application"
 readme = "README.rst"
+requires-python = ">=3.9"
 authors = [{name = "Heechul Kim", email = "jijisa@iorchard.net"}]
 dependencies = [
     "python-dotenv"
 ]
 [project.scripts]
-diskalert = "diskalert.__main__:main"
+diskalert = "diskalert.diskalert:main"
+
+[project.urls]
+"Repository" = "https://github.com/jijisa/diskalert.git"

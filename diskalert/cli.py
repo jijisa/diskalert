@@ -71,7 +71,7 @@ def app(d_vars: dict) -> None:
                 os.unlink(s_msg_file)
         time.sleep(int(config['SLEEP']))
 
-def main():
+if __name__ == '__main__':
     """Diskalert main program"""
     parser = argparse.ArgumentParser(
             prog='diskalert',
