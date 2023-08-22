@@ -3,9 +3,9 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "diskalert"
+name = "diskpatrol"
 version = "0.0.1"
-description = "Disk Alert application"
+description = "Disk Patrol application"
 readme = "README.rst"
 requires-python = ">=3.9"
 authors = [{name = "Heechul Kim", email = "jijisa@iorchard.net"}]
@@ -13,7 +13,7 @@ dependencies = [
     "python-dotenv"
 ]
 [project.scripts]
-diskalert = "diskalert.diskalert:main"
+diskpatrol = "diskpatrol.cli:main"
 
 [project.urls]
-"Repository" = "https://github.com/jijisa/diskalert.git"
+"Repository" = "https://github.com/jijisa/diskpatrol.git"
