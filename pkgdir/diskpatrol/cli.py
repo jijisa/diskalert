@@ -26,6 +26,13 @@ def handler(signum, frame):
 signal.signal(signal.SIGINT, handler)
 signal.signal(signal.SIGHUP, handler)
 
+def humanize(num, suffix="B"):
+    for unit in ("", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"):
+        if abs(num) < 1024.0:
+            return f"{num:3.1f}{unit}{suffix}"
+        num /= 1024.0
+    return f"{num:.1f}Yi{suffix}"
+
 def app(d_vars: dict, parser) -> None:
     """diskpatrol application"""
     s_prog = parser.prog
@@ -66,19 +73,23 @@ def app(d_vars: dict, parser) -> None:
             else:
                 s_msgfile_prefix += '-root'
             o_stat = shutil.disk_usage(s_path)
+            print(f"{o_stat.used} / {o_stat.total}")
             i_used_percent = int(math.ceil(o_stat.used/o_stat.total*100))
-            if i_used_percent > d_thresholds['warning']:
-                if i_used_percent > d_thresholds['critical']:
+            print(i_used_percent)
+            if i_used_percent >= d_thresholds['warning']:
+                if i_used_percent >= d_thresholds['critical']:
                     s_level = 'critical'
-                elif i_used_percent > d_thresholds['error']:
+                elif i_used_percent >= d_thresholds['error']:
                     s_level = 'error'
                 else:
                     s_level = 'warning'
                 s_msgfile = s_msgfile_prefix + '_' + s_level
                 s_msg = f"The used space of {s_path} is above {s_level} " + \
                         f"level ({d_thresholds[s_level]}%).\n" + \
-                        f"used%: {i_used_percent}%\n" + \
-                        f"{o_stat.used}/{o_stat.total}\n\n" + \
+                        "used/total: " + \
+                        f"{humanize(o_stat.used)}/{humanize(o_stat.total)}" + \
+                        f" ({i_used_percent}% used)" + \
+                        "\n\n" + \
                         f"Please delete some files in {s_path}."
                 s_log = s_msg.replace('\n', ' ')
                 if s_level == 'critical':
@@ -102,7 +113,8 @@ def app(d_vars: dict, parser) -> None:
                             port=int(config['SMTP_PORT'])) as smtp:
                         smtp.sendmail(s_sender, l_recipients, s_mail)
             else:
-                s_log = f"The used space of {s_path} is below warning level."
+                s_log = f"The used space of {s_path} is below " + \
+                        f"warning level ({d_thresholds['warning']}%)"
                 logging.info(s_log)
                 # clean up message files
                 logging.debug(f"clean up {s_msgfile_prefix}_*")
