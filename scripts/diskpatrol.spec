@@ -13,7 +13,6 @@ A Disk Patrol Application
 %prep
 %autosetup
 
-
 %install
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/%{_bindir}
@@ -26,6 +25,8 @@ cp %{name}.service $RPM_BUILD_ROOT/%{_sysconfdir}/systemd/system
 %{_bindir}/%{name}
 %{_sysconfdir}/%{name}.conf
 %{_sysconfdir}/systemd/system/%{name}.service
+
+%config(noreplace) %{_sysconfdir}/%{name}.conf
 
 %changelog
 * Tue Aug 22 2023 Heechul Kim <jijisa@iorchard.net>

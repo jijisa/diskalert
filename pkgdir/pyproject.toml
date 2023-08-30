@@ -6,12 +6,17 @@ build-backend = "setuptools.build_meta"
 name = "diskpatrol"
 version = "0.0.1"
 description = "Disk Patrol application"
+license = {text = "GPL version 3"}
 readme = "README.rst"
 requires-python = ">=3.9"
 authors = [{name = "Heechul Kim", email = "jijisa@iorchard.net"}]
+maintainers = [{name = "Heechul Kim", email = "jijisa@iorchard.net"}]
 dependencies = [
-    "python-dotenv"
+    "python-dotenv",
+    "requests",
+    "chardet"
 ]
+
 [project.scripts]
 diskpatrol = "diskpatrol.cli:main"
 

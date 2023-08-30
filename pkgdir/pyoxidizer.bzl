@@ -1,6 +1,8 @@
 def make_exe():
     dist = default_python_distribution()
     policy = dist.make_python_packaging_policy()
+    policy.resources_location = "in-memory"
+    policy.resources_location_fallback =  "filesystem-relative:relative"
     python_config = dist.make_python_interpreter_config()
     python_config.run_command = "from diskpatrol.cli import main; main()"
     exe = dist.to_python_executable(

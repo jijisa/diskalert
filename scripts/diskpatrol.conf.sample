@@ -4,7 +4,7 @@ SLEEP=60
 
 ## Check paths
 # If you want to monitor multiple paths, add comma-separated paths.
-PATHS=/,/run
+PATHS=/
 
 ## Thresholds
 # used% of disk space
@@ -13,22 +13,27 @@ ERROR=70
 CRITICAL=80
 
 ## log config
-# log level: logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR
-LOGLEVEL=logging.INFO
+# log level: debug, info, warning, error, critical
+LOGLEVEL=info
 # log file location
 LOGFILE=/var/log/diskpatrol.log
 
-## message dir
-MSGDIR=/dev/shm
-
-## enable wall message
+## Transport: Wall
 ENABLE_WALL=1
+WALL_ALERT_LEVEL=warning
 
-## enable email message
+## Transport: Email
 ENABLE_EMAIL=0
+EMAIL_ALERT_LEVEL=warning
 # SMTP server 
 SMTP_SERVER="localhost"
 # SMTP port
 SMTP_PORT=25
 # comma-separated recipient email addresses
-RECIPIENT_EMAILS="jijisa@iorchard.co.kr"
+RECIPIENT_EMAILS=""
+
+## Transport: Telegram
+ENABLE_TELEGRAM=0
+TELEGRAM_ALERT_LEVEL=warning
+APITOKEN=""
+CHATID=""

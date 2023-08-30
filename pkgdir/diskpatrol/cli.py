@@ -9,10 +9,15 @@ import socket
 import logging
 import smtplib
 import argparse
+import requests
 
 from subprocess import Popen
 
 from dotenv import dotenv_values
+
+d_level = { "debug": 10, "info": 20, "warning": 30, 
+            "error": 40, "critical": 50 }
+MSGDIR = "/dev/shm"
 
 def handler(signum, frame):
     if signum == signal.SIGINT:
@@ -26,6 +31,16 @@ def handler(signum, frame):
 signal.signal(signal.SIGINT, handler)
 signal.signal(signal.SIGHUP, handler)
 
+def send_telegram(msg: str, token: str, chatid: str) -> None:
+    s_url = f"https://api.telegram.org/bot{token}/sendMessage"
+    logging.debug(s_url)
+    try:
+        response = requests.post(s_url, json={'chat_id': chatid, 'text': msg})
+        logging.debug(response.text)
+        logging.debug("Sent telegram alert.")
+    except Exception as e:
+        logging.error(e)
+
 def humanize(num, suffix="B"):
     for unit in ("", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"):
         if abs(num) < 1024.0:
@@ -33,26 +48,13 @@ def humanize(num, suffix="B"):
         num /= 1024.0
     return f"{num:.1f}Yi{suffix}"
 
-def app(d_vars: dict, parser) -> None:
+def app(d_vars: dict, parser, config: dict) -> None:
     """diskpatrol application"""
     s_prog = parser.prog
     s_fqdn = socket.getaddrinfo(socket.gethostname(), 0, 
             flags=socket.AI_CANONNAME)[0][3]
     s_sender = f'diskpatrol@{s_fqdn}'
-    config = {
-        **dotenv_values(d_vars['conffile']),
-    }
     l_recipients = config['RECIPIENT_EMAILS'].split(',')
-    level = logging.DEBUG if d_vars['debug'] else eval(config['LOGLEVEL'])
-    logfile = d_vars['logfile'] if d_vars['logfile'] else config['LOGFILE']
-    try:
-        logging.basicConfig(
-            format='%(asctime)s %(levelname)s:%(message)s',
-            filename=logfile,
-            level=level)
-    except Exception as e:
-        logging.exception(e)
-        parser.exit(1, message=str(e))
 
     if not os.path.isfile(d_vars['conffile']):
         s_msg = f"Error: cannot find the env file {d_vars['conffile']}\n"
@@ -67,15 +69,13 @@ def app(d_vars: dict, parser) -> None:
     
     while True:
         for s_path in config['PATHS'].split(','):
-            s_msgfile_prefix = config['MSGDIR'] + '/' + s_prog
+            s_msgfile_prefix = MSGDIR + '/' + s_prog
             if os.path.basename(s_path):
                 s_msgfile_prefix += s_path.replace('/', '-')
             else:
                 s_msgfile_prefix += '-root'
             o_stat = shutil.disk_usage(s_path)
-            print(f"{o_stat.used} / {o_stat.total}")
             i_used_percent = int(math.ceil(o_stat.used/o_stat.total*100))
-            print(i_used_percent)
             if i_used_percent >= d_thresholds['warning']:
                 if i_used_percent >= d_thresholds['critical']:
                     s_level = 'critical'
@@ -91,6 +91,7 @@ def app(d_vars: dict, parser) -> None:
                         f" ({i_used_percent}% used)" + \
                         "\n\n" + \
                         f"Please delete some files in {s_path}."
+                s_subject = f"DiskPatrol: {s_path} is in {s_level} level."
                 s_log = s_msg.replace('\n', ' ')
                 if s_level == 'critical':
                     logging.critical(s_log)
@@ -100,11 +101,14 @@ def app(d_vars: dict, parser) -> None:
                     logging.warning(s_log)
                 with open(s_msgfile, 'w') as f:
                     f.write(s_msg)
-                if config['ENABLE_WALL'] == '1':
+                if config['ENABLE_WALL'] == '1' and \
+                    d_level[s_level] >= d_level[config['WALL_ALERT_LEVEL']]:
+                    logging.debug("Send wall alert.")
                     s_wall_cmd = f'cat {s_msgfile} | wall'
                     o_proc = Popen(s_wall_cmd, shell=True)
-                if config['ENABLE_EMAIL'] == '1':
-                    s_subject = f"DiskPatrol: {s_path} is in {s_level} level."
+                if config['ENABLE_EMAIL'] == '1' and \
+                    d_level[s_level] >= d_level[config['EMAIL_ALERT_LEVEL']]:
+                    logging.debug("Send email alert.")
                     s_mail = f"From: {s_sender}\n" + \
                             f"To: {config['RECIPIENT_EMAILS']}\n" + \
                             f"Subject: {s_subject}\n\n" + \
@@ -112,9 +116,18 @@ def app(d_vars: dict, parser) -> None:
                     with smtplib.SMTP(host=config['SMTP_SERVER'],
                             port=int(config['SMTP_PORT'])) as smtp:
                         smtp.sendmail(s_sender, l_recipients, s_mail)
+                if config['ENABLE_TELEGRAM'] == '1' and \
+                    d_level[s_level] >= d_level[config['TELEGRAM_ALERT_LEVEL']]:
+                    logging.debug("Send telegram alert.")
+                    if config['APITOKEN'] and config['CHATID']:
+                        s_telegram = f"{s_sender}\n{s_subject}\n\n{s_msg}"
+                        send_telegram(s_telegram, config['APITOKEN'],
+                            config['CHATID'])
+                    else:
+                        logging.warning("APITOKEN and/or CHATID not set")
             else:
-                s_log = f"The used space of {s_path} is below " + \
-                        f"warning level ({d_thresholds['warning']}%)"
+                s_log = f"The used space of {s_path} ({i_used_percent}%) " + \
+                        f"is below warning level ({d_thresholds['warning']}%)"
                 logging.info(s_log)
                 # clean up message files
                 logging.debug(f"clean up {s_msgfile_prefix}_*")
@@ -142,9 +155,17 @@ def main():
     config = {
         **dotenv_values(d_vars['conffile']),
     }
-    print(d_vars)
-    print(config)
-    app(d_vars, parser)
+    level = logging.DEBUG if d_vars['debug'] else d_level[config['LOGLEVEL']]
+    logfile = d_vars['logfile'] if d_vars['logfile'] else config['LOGFILE']
+    try:
+        logging.basicConfig(
+            format='%(asctime)s %(levelname)s:%(message)s',
+            filename=logfile,
+            level=level)
+    except Exception as e:
+        logging.exception(e)
+        parser.exit(1, message=str(e))
+    app(d_vars, parser, config)
 
 if __name__ == '__main__':
     main()
