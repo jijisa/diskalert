@@ -8,21 +8,23 @@ BINFILE="${PKGDIR}/build/x86_64-unknown-linux-gnu/debug/exe/diskpatrol"
 function get_distro() {
   if [[ -f /etc/os-release ]]; then
     source /etc/os-release
-    echo $ID
+    echo ${ID}-${VERSION_ID}
   else
     echo "Unknown"
   fi
 }
 
+function prepare_centos7() {
+  yum -y install python3-pip curl gcc make rpmdevtools rpmlint
+}
 function prepare_rocky() {
-  dnf -y install python3-pip curl gcc make
+  dnf -y install python3-pip curl gcc make rpmdevtools rpmlint
 }
 function prepare_debian() {
   apt update && apt -y install python3-pip curl gcc make
 }
 
 function build_rpm() {
-  dnf install -y rpmdevtools rpmlint
   rpmdev-setuptree
   pushd ${WORKSPACE}/scripts
     cp diskpatrol.spec /root/rpmbuild/SPECS/
@@ -40,10 +42,13 @@ function build_rpm() {
 
 function main() {
   case $(get_distro) in
-    rocky)
+    centos-7)
+      prepare_centos7
+      ;;
+    rocky-8.8)
       prepare_rocky
       ;;
-    debian)
+    debian-10)
       prepare_debian
       ;;
   esac
@@ -61,10 +66,13 @@ function main() {
   cp ${BINFILE} ${OUTPUT_DIR}
 
   case $(get_distro) in
-    rocky)
+    centos-7)
       build_rpm
       ;;
-    debian)
+    rocky-8.8)
+      build_rpm
+      ;;
+    debian-10)
       build_deb
       ;;
   esac

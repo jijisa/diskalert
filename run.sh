@@ -5,9 +5,9 @@ set -e
 function USAGE() {
   echo "USAGE: $(basename $0) [-h] [-b] [-r] [debian|rocky]" 1>&2
   echo
-  echo " -h                     Display this help message."
-  echo " -b [debian|rocky]      Build diskpatrol."
-  echo " -r [debian|rocky]      Run into diskpatrol build env."
+  echo " -h                             Display this help message."
+  echo " -b [debian|rocky|centos7]      Build diskpatrol."
+  echo " -r [debian|rocky|centos7]      Run into diskpatrol build env."
   echo
 }
 while getopts 'b:r:h' opt; do
@@ -31,6 +31,9 @@ while getopts 'b:r:h' opt; do
 done
 
 case "${DISTRO}" in
+  centos7)
+    FROM="docker.io/centos:7"
+    ;;
   debian)
     FROM="docker.io/debian:10-slim"
     ;;
