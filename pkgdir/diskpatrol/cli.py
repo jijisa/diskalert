@@ -91,7 +91,7 @@ def app(d_vars: dict, parser, config: dict) -> None:
                         f" ({i_used_percent}% used)" + \
                         "\n\n" + \
                         f"Please delete some files in {s_path}."
-                s_subject = f"DiskPatrol: {s_path} is in {s_level} level."
+                s_subject = f"DiskPatrol: {s_path} is above {s_level} level."
                 s_log = s_msg.replace('\n', ' ')
                 if s_level == 'critical':
                     logging.critical(s_log)
@@ -100,11 +100,11 @@ def app(d_vars: dict, parser, config: dict) -> None:
                 else:
                     logging.warning(s_log)
                 with open(s_msgfile, 'w') as f:
-                    f.write(s_msg)
+                    f.write(f"{s_subject}\n\n{s_msg}")
                 if config['ENABLE_WALL'] == '1' and \
                     d_level[s_level] >= d_level[config['WALL_ALERT_LEVEL']]:
                     logging.debug("Send wall alert.")
-                    s_wall_cmd = f'cat {s_msgfile} | wall'
+                    s_wall_cmd = f"cat {s_msgfile} | wall -n"
                     o_proc = Popen(s_wall_cmd, shell=True)
                 if config['ENABLE_EMAIL'] == '1' and \
                     d_level[s_level] >= d_level[config['EMAIL_ALERT_LEVEL']]:

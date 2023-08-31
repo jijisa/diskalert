@@ -29,6 +29,7 @@ function build_rpm() {
     mkdir -p /diskpatrol-${VER}
     cp diskpatrol.conf.sample /diskpatrol-${VER}/diskpatrol.conf
     cp diskpatrol.service ${BINFILE} /diskpatrol-${VER}/
+    cp diskpatrol.logrotate /diskpatrol-${VER}/
   popd
   pushd /
     tar cvzf /root/rpmbuild/SOURCES/diskpatrol-${VER}.tar.gz diskpatrol-${VER}
