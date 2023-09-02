@@ -17,12 +17,18 @@ from dotenv import dotenv_values
 
 d_level = { "debug": 10, "info": 20, "warning": 30, 
             "error": 40, "critical": 50 }
-MSGDIR = "/dev/shm"
+MSGDIR = "/tmp"
 
 def handler(signum, frame):
     if signum == signal.SIGINT:
         res = input("Ctrl-C is pressed. Do you want to exit? (y/n) ")
         if res == 'y':
+            logging.debug(f"clean up diskpatrol temp files")
+            try:
+                for f in glob.glob(f"{MSGDIR}/diskpatrol-*"):
+                    os.unlink(f)
+            except Exception as e:
+                logging.exception(e)
             sys.exit(0)
     if signum == signal.SIGHUP:
         logging.info("Received SIGHUP. Reload config file.")
@@ -108,23 +114,106 @@ def app(d_vars: dict, parser, config: dict) -> None:
                     o_proc = Popen(s_wall_cmd, shell=True)
                 if config['ENABLE_EMAIL'] == '1' and \
                     d_level[s_level] >= d_level[config['EMAIL_ALERT_LEVEL']]:
-                    logging.debug("Send email alert.")
-                    s_mail = f"From: {s_sender}\n" + \
-                            f"To: {config['RECIPIENT_EMAILS']}\n" + \
-                            f"Subject: {s_subject}\n\n" + \
-                            s_msg
-                    with smtplib.SMTP(host=config['SMTP_SERVER'],
-                            port=int(config['SMTP_PORT'])) as smtp:
-                        smtp.sendmail(s_sender, l_recipients, s_mail)
-                if config['ENABLE_TELEGRAM'] == '1' and \
-                    d_level[s_level] >= d_level[config['TELEGRAM_ALERT_LEVEL']]:
-                    logging.debug("Send telegram alert.")
-                    if config['APITOKEN'] and config['CHATID']:
-                        s_telegram = f"{s_sender}\n{s_subject}\n\n{s_msg}"
-                        send_telegram(s_telegram, config['APITOKEN'],
-                            config['CHATID'])
+                    s_emailcount = f"{s_msgfile_prefix}_{s_level}_emailcount"
+                    if os.path.isfile(s_emailcount):
+                        with open(s_emailcount, 'r') as f:
+                            i_emailcount = int(f.read())
                     else:
-                        logging.warning("APITOKEN and/or CHATID not set")
+                        # remove other level count files when level is changed.
+                        logging.debug(f"Alert level is changed tp {s_level}")
+                        logging.debug("Remove other level count files.")
+                        if s_level == 'critical':
+                            l_countfile = [
+                                f"{s_msgfile_prefix}_warn_emailcount",
+                                f"{s_msgfile_prefix}_error_emailcount"
+                            ]
+                        elif s_level == 'error':
+                            l_countfile = [
+                                f"{s_msgfile_prefix}_warn_emailcount",
+                                f"{s_msgfile_prefix}_critical_emailcount"
+                            ]
+                        else:
+                            l_countfile = [
+                                f"{s_msgfile_prefix}_error_emailcount",
+                                f"{s_msgfile_prefix}_critical_emailcount"
+                            ]
+                        for f in l_countfile:
+                            os.unlink(f)
+                        logging.debug(f"Create {s_emailcount}.")
+                        with open(s_emailcount, 'w') as f:
+                            f.write('1')
+                        i_emailcount = 1
+                    if i_emailcount > \
+                        int(config['EMAIL_ALERT_COUNT']) + \
+                        int(config['EMAIL_ALERT_SKIP']):
+                        logging.debug("Reset the email alert count.")
+                        with open(s_emailcount, 'w') as f:
+                            f.write('1')
+                        i_emailcount = 1
+                    logging.debug(f"Email alert {i_emailcount} " + \
+                                    f"out of {config['EMAIL_ALERT_COUNT']}")
+                    if i_emailcount <= int(config['EMAIL_ALERT_COUNT']):
+                        logging.debug("Send email alert.")
+                        s_mail = f"From: {s_sender}\n" + \
+                                f"To: {config['RECIPIENT_EMAILS']}\n" + \
+                                f"Subject: {s_subject}\n\n" + \
+                                s_msg
+                        with smtplib.SMTP(host=config['SMTP_SERVER'],
+                                port=int(config['SMTP_PORT'])) as smtp:
+                            smtp.sendmail(s_sender, l_recipients, s_mail)
+                    with open(s_emailcount, 'w') as f:
+                        f.write(str(i_emailcount+1))
+                if config['ENABLE_TELEGRAM'] == '1' and \
+                    d_level[s_level]>=d_level[config['TELEGRAM_ALERT_LEVEL']]:
+                    s_telegramcount = f"{s_msgfile_prefix}_{s_level}_" + \
+                                        "telegramcount"
+                    if os.path.isfile(s_telegramcount):
+                        with open(s_telegramcount, 'r') as f:
+                            i_telegramcount = int(f.read())
+                    else:
+                        # remove other level count files when level is changed.
+                        logging.debug(f"Alert level is changed tp {s_level}")
+                        logging.debug("Remove other level count files.")
+                        if s_level == 'critical':
+                            l_countfile = [
+                                f"{s_msgfile_prefix}_warn_telegramcount",
+                                f"{s_msgfile_prefix}_error_telegramcount"
+                            ]
+                        elif s_level == 'error':
+                            l_countfile = [
+                                f"{s_msgfile_prefix}_warn_telegramcount",
+                                f"{s_msgfile_prefix}_critical_telegramcount"
+                            ]
+                        else:
+                            l_countfile = [
+                                f"{s_msgfile_prefix}_error_telegramcount",
+                                f"{s_msgfile_prefix}_critical_telegramcount"
+                            ]
+                        for f in l_countfile:
+                            os.unlink(f)
+                        logging.debug(f"Create {s_telegramcount}.")
+                        with open(s_telegramcount, 'w') as f:
+                            f.write('1')
+                        i_telegramcount = 1
+                    if i_telegramcount > \
+                        int(config['TELEGRAM_ALERT_COUNT']) + \
+                        int(config['TELEGRAM_ALERT_SKIP']):
+                        logging.debug("Reset the telegram alert count.")
+                        with open(s_telegramcount, 'w') as f:
+                            f.write('1')
+                        i_telegramcount = 1
+                    logging.debug(f"Telegram alert: {i_telegramcount} " + \
+                                  f"out of {config['TELEGRAM_ALERT_COUNT']}")
+                    if i_telegramcount <= int(config['TELEGRAM_ALERT_COUNT']):
+                        logging.debug("Send telegram alert.")
+                        if config['APITOKEN'] and config['CHATID']:
+                            s_telegram = f"{s_sender}\n{s_subject}\n\n{s_msg}"
+                            send_telegram(s_telegram, config['APITOKEN'],
+                                config['CHATID'])
+                        else:
+                            logging.warning("APITOKEN and/or CHATID not set")
+                    with open(s_telegramcount, 'w') as f:
+                        f.write(str(i_telegramcount+1))
             else:
                 s_log = f"The used space of {s_path} ({i_used_percent}%) " + \
                         f"is below warning level ({d_thresholds['warning']}%)"

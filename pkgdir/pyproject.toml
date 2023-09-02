@@ -4,7 +4,6 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "diskpatrol"
-version = "0.0.1"
 description = "Disk Patrol application"
 license = {text = "GPL version 3"}
 readme = "README.rst"
@@ -16,9 +15,13 @@ dependencies = [
     "requests",
     "chardet"
 ]
+dynamic = ["version"]
 
 [project.scripts]
 diskpatrol = "diskpatrol.cli:main"
 
 [project.urls]
 "Repository" = "https://github.com/jijisa/diskpatrol.git"
+
+[tool.setuptools.dynamic]
+version = {attr = "diskpatrol.__version__"}

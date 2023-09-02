@@ -1,5 +1,5 @@
 Name:           diskpatrol
-Version:        0.0.1
+Version:        %%VERSION%%
 Release:        1%{?dist}
 Summary:        A diskpatrol program
 
@@ -19,7 +19,8 @@ mkdir -p $RPM_BUILD_ROOT/%{_bindir}
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/systemd/system
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/logrotate.d
 cp %{name} $RPM_BUILD_ROOT/%{_bindir}
-cp %{name}.conf $RPM_BUILD_ROOT/%{_sysconfdir}
+[ ! -f $RPM_BUILD_ROOT/%{_sysconfdir}/%{name}.conf ] && \
+    cp %{name}.conf $RPM_BUILD_ROOT/%{_sysconfdir} || :
 cp %{name}.service $RPM_BUILD_ROOT/%{_sysconfdir}/systemd/system
 cp %{name}.logrotate $RPM_BUILD_ROOT/%{_sysconfdir}/logrotate.d/%{name}
 

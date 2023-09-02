@@ -27,6 +27,7 @@ function prepare_debian() {
 function build_rpm() {
   rpmdev-setuptree
   pushd ${WORKSPACE}/scripts
+    sed -i "s/%%VERSION%%/${VER}/" diskpatrol.spec
     cp diskpatrol.spec /root/rpmbuild/SPECS/
     mkdir -p /diskpatrol-${VER}
     cp diskpatrol.conf.sample /diskpatrol-${VER}/diskpatrol.conf

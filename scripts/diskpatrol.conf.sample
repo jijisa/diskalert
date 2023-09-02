@@ -25,6 +25,16 @@ WALL_ALERT_LEVEL=warning
 ## Transport: Email
 ENABLE_EMAIL=0
 EMAIL_ALERT_LEVEL=warning
+# Max consecutive alert count for each threshold
+# Alert will be fired 3 consecutive times(default value) and 
+# Alert will be fired again after skipping EMAIL_ALERT_SKIP times 
+EMAIL_ALERT_COUNT=3
+# Skip alerts for each threshold 
+# Alert will be skipped for SLEEP*This value
+# If SLEEP is 60, Alert will be skipped for 60*10 = 600 seconds.
+# If you do not want to skip, set this to 0. 
+# Then alert will be fired every SLEEP seconds.
+EMAIL_ALERT_SKIP=10
 # SMTP server 
 SMTP_SERVER="localhost"
 # SMTP port
@@ -35,5 +45,15 @@ RECIPIENT_EMAILS=""
 ## Transport: Telegram
 ENABLE_TELEGRAM=0
 TELEGRAM_ALERT_LEVEL=warning
+# Max consecutive alert count for each threshold
+# Alert will be fired 3 consecutive times(default value) and 
+# Alert will be fired again after skipping TELEGRAM_ALERT_SKIP times 
+TELEGRAM_ALERT_COUNT=3
+# Skip alerts for each threshold 
+# Alert will be skipped for SLEEP*This value
+# If SLEEP is 60, Alert will be skipped for 60*10 = 600 seconds.
+# If you do not want to skip, set this to 0. 
+# Then alert will be fired every SLEEP seconds.
+TELEGRAM_ALERT_SKIP=10
 APITOKEN=""
 CHATID=""
