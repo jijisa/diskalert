@@ -19,8 +19,7 @@ mkdir -p $RPM_BUILD_ROOT/%{_bindir}
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/systemd/system
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/logrotate.d
 cp %{name} $RPM_BUILD_ROOT/%{_bindir}
-[ ! -f $RPM_BUILD_ROOT/%{_sysconfdir}/%{name}.conf ] && \
-    cp %{name}.conf $RPM_BUILD_ROOT/%{_sysconfdir} || :
+cp %{name}.conf $RPM_BUILD_ROOT/%{_sysconfdir}
 cp %{name}.service $RPM_BUILD_ROOT/%{_sysconfdir}/systemd/system
 cp %{name}.logrotate $RPM_BUILD_ROOT/%{_sysconfdir}/logrotate.d/%{name}
 

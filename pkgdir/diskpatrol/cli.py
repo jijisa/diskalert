@@ -138,7 +138,8 @@ def app(d_vars: dict, parser, config: dict) -> None:
                                 f"{s_msgfile_prefix}_critical_emailcount"
                             ]
                         for f in l_countfile:
-                            os.unlink(f)
+                            if os.path.isfile(f):
+                                os.unlink(f)
                         logging.debug(f"Create {s_emailcount}.")
                         with open(s_emailcount, 'w') as f:
                             f.write('1')
@@ -190,7 +191,8 @@ def app(d_vars: dict, parser, config: dict) -> None:
                                 f"{s_msgfile_prefix}_critical_telegramcount"
                             ]
                         for f in l_countfile:
-                            os.unlink(f)
+                            if os.path.isfile(f):
+                                os.unlink(f)
                         logging.debug(f"Create {s_telegramcount}.")
                         with open(s_telegramcount, 'w') as f:
                             f.write('1')
