@@ -25,8 +25,8 @@ WALL_ALERT_LEVEL=warning
 ## Transport: Email
 ENABLE_EMAIL=0
 EMAIL_ALERT_LEVEL=warning
-# Max consecutive alert count for each threshold
-# Alert will be fired 3 consecutive times(default value) and 
+# Max consecutive same alerts for each threshold
+# Alert will be fired 3 consecutive times(default) and 
 # Alert will be fired again after skipping EMAIL_ALERT_SKIP times 
 EMAIL_ALERT_COUNT=3
 # Skip alerts for each threshold 
@@ -45,8 +45,8 @@ RECIPIENT_EMAILS=""
 ## Transport: Telegram
 ENABLE_TELEGRAM=0
 TELEGRAM_ALERT_LEVEL=warning
-# Max consecutive alert count for each threshold
-# Alert will be fired 3 consecutive times(default value) and 
+# Max consecutive same alerts for each threshold
+# Alert will be fired 3 consecutive times(default) and 
 # Alert will be fired again after skipping TELEGRAM_ALERT_SKIP times 
 TELEGRAM_ALERT_COUNT=3
 # Skip alerts for each threshold 
