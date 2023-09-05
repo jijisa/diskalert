@@ -64,7 +64,7 @@ function main() {
   pyoxidizer build --system-rust --path=${PKGDIR}
   strip ${BINFILE}
   chmod 0755 ${BINFILE}
-  cp ${BINFILE} ${OUTPUT_DIR}
+  #cp ${BINFILE} ${OUTPUT_DIR}
 
   case $(get_distro) in
     centos-7)
