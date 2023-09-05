@@ -10,6 +10,22 @@ There are 3 alert transports.
 * Email transport: send alert message to the mail recipients.
 * Telegram transport: send alert message to the telegram.
 
+Build (Optional)
+-----------------
+
+If you want to build rpm package, install docker and run run.sh script.::
+
+    $ ./run.sh -h
+    USAGE: run.sh [-h] [-b] [-r] [debian|rocky|centos7]
+    
+     -h                             Display this help message.
+     -b [debian|rocky|centos7]      Build diskpatrol.
+     -r [debian|rocky|centos7]      Run into diskpatrol build env.
+
+To build rpm package for rocky linux::
+
+    $ ./run.sh -b rocky
+
 Install
 --------
 
@@ -109,5 +125,4 @@ https://core.telegram.org/bots/features#botfather
 
 You need to set APITOKEN and CHATID in /etc/diskpatrol.conf to send
 telegram message.
-
 
