@@ -54,9 +54,9 @@ function main() {
       ;;
   esac
   VER=$(python3 ${PKGDIR}/diskpatrol/__init__.py)
+
   python3 -m pip install -U pip
   python3 -m pip install pyoxidizer
-
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | \
     sh -s -- --no-modify-path -y
 
@@ -64,7 +64,7 @@ function main() {
   pyoxidizer build --system-rust --path=${PKGDIR}
   strip ${BINFILE}
   chmod 0755 ${BINFILE}
-  #cp ${BINFILE} ${OUTPUT_DIR}
+  cp ${BINFILE} ${OUTPUT_DIR}
 
   case $(get_distro) in
     centos-7)
