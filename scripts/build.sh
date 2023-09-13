@@ -24,6 +24,22 @@ function prepare_debian() {
   apt update && apt -y install python3-pip curl gcc make
 }
 
+function build_deb() {
+  DEBBUILD="/diskpatrol_${VER}-1_amd64"
+  mkdir -p ${DEBBUILD}/{DEBIAN,usr/bin,etc/logrotate.d,etc/systemd/system}
+  pushd ${WORKSPACE}/scripts
+    sed -i "s/%%VERSION%%/${VER}-1/" diskpatrol.control
+    cp diskpatrol.control ${DEBBUILD}/DEBIAN/control
+    cp diskpatrol.conf.sample ${DEBBUILD}/etc/diskpatrol.conf
+    cp diskpatrol.service ${DEBBUILD}/etc/systemd/system/
+    cp diskpatrol.logrotate ${DEBBUILD}/etc/logrotate.d/diskpatrol
+    cp ${BINFILE} ${DEBBUILD}/usr/bin/
+  popd
+  pushd /
+    dpkg-deb --build --root-owner-group ${DEBBUILD}
+  popd
+  cp ${DEBBUILD}.deb ${OUTPUT_DIR}
+}
 function build_rpm() {
   rpmdev-setuptree
   pushd ${WORKSPACE}/scripts
