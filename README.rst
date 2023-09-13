@@ -4,7 +4,7 @@ Disk Patrol
 This is a program to check disk space and alert
 if the used space is above the configured threshold.
 
-There are 3 alert transports.
+Here are the alert transports.
 
 * Wall transport: send alert message to the logged-in users.
 * Email transport: send alert message to the mail recipients.
