@@ -8,7 +8,8 @@ There are 3 alert transports.
 
 * Wall transport: send alert message to the logged-in users.
 * Email transport: send alert message to the mail recipients.
-* Telegram transport: send alert message to the telegram.
+* Telegram transport: send alert message to the telegram chat id.
+* Slack transport: send alert message to the slack chaneel.
 
 Build (Optional)
 -----------------
