@@ -19,7 +19,7 @@ LOGLEVEL=info
 LOGFILE=/var/log/diskpatrol.log
 
 ## Transport: Wall
-ENABLE_WALL=1
+ENABLE_WALL=0
 WALL_ALERT_LEVEL=warning
 
 ## Transport: Email
