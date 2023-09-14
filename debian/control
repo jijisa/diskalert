@@ -1,0 +1,14 @@
+Source: diskpatrol
+Section: admin
+Priority: optional
+Maintainer: Heechul Kim <jijisa@iorchard.net>
+Build-Depends: debhelper (>= 11), python3-pip, curl, gcc, make
+Standards-Version: 4.1.3
+Homepage: https://github.com/iorchard/diskpatrol.git
+
+Package: diskpatrol
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Disk space check and alert program
+ This is a program to check disk space and alert if the used space is above
+ the configured threshold.

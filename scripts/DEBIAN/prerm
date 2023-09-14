@@ -1,0 +1,5 @@
+#!/bin/sh
+
+deb-systemd-invoke stop diskpatrol.service >/dev/null
+deb-systemd-invoke disable diskpatrol.service >/dev/null
+deb-systemd-invoke mask diskpatrol.service >/dev/null

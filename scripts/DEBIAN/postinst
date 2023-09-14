@@ -1,0 +1,10 @@
+#!/bin/sh
+
+if [ -d /run/systemd/system ]; then
+  systemctl --system daemon-reload >/dev/null || true
+fi
+echo "start systemd diskpatrol.service."
+
+deb-systemd-invoke enable diskpatrol.service >/dev/null
+deb-systemd-invoke start diskpatrol.service >/dev/null
+

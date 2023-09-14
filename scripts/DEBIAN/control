@@ -1,0 +1,9 @@
+Package: diskpatrol
+Version: %%VERSION%%
+Section: admin
+Priority: optional
+Architecture: amd64
+Maintainer: Heechul Kim <jijisa@iorchard.net>
+Description: Disk space check and alert program
+ This is a program to check disk space and alert if the used space is above
+ the configured threshold.
