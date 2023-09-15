@@ -30,10 +30,13 @@ To build rpm package for rocky linux::
 Install
 --------
 
+For RHEL-based distro
++++++++++++++++++++++++
+
 Install diskpatrol rpm package from the internal genesis file server.::
 
     $ sudo dnf -y install \
-        http://192.168.151.110:8000/burrito/diskpatrol-0.0.1-1.el8.x86_64.rpm
+        http://192.168.151.110:8000/burrito/diskpatrol-0.2.0-1.el8.x86_64.rpm
 
 Optionally, Install postfix rpm package from the internal genesis file server
 if you want to use email transport.::
@@ -41,10 +44,25 @@ if you want to use email transport.::
     $ sudo dnf -y install \
         http://192.168.151.110:8000/burrito/postfix-3.5.8-4.el8.x86_64.rpm
 
+For Debian-based distro
+++++++++++++++++++++++++
+
+Install diskpatrol debian package from the internal genesis file server.::
+
+    $ curl -LO http://192.168.151.110:8000/burrito/diskpatrol_0.2.0-1_amd64.deb
+    $ sudo dpkg -i diskpatrol_0.2.0-1_amd64.deb
+
+Optionally, Install postfix rpm package if you want to use email transport.::
+
+    $ sudo apt update && sudo apt install postfix
+
+Choose 'No configuration' when it asks the mail server configuration type.
+
+
 Configure
 ----------
 
-Back up /etc/postfix/main.cf to /etc/postfix/main.cf.bak.::
+If there is /etc/postfix/main.cf, back it up to /etc/postfix/main.cf.bak.::
 
     $ sudo mv /etc/postfix/main.cf /etc/postfix/main.cf.bak
 

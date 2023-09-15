@@ -13,4 +13,7 @@ diskpatrol:
 
 install: diskpatrol
 	install -m 0755 $(BINFILE) /usr/bin
+	install -m 0640 scripts/diskpatrol.conf.sample /etc/diskpatrol.conf
+	install -m 0644 scripts/diskpatrol.service /etc/systemd/system/
+	install -m 0644 scripts/diskpatrol.logrotate /etc/logrotate.d/diskpatrol
 

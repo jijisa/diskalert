@@ -8,5 +8,7 @@ WORKDIR     ${WORKSPACE}
 
 COPY        pkgdir ${WORKSPACE}/pkgdir
 COPY        scripts ${WORKSPACE}/scripts
+COPY        debian ${WORKSPACE}/debian
+COPY        Makefile ${WORKSPACE}/Makefile
 
 ENTRYPOINT  ["/build/scripts/build.sh"]
