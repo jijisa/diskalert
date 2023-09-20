@@ -82,7 +82,7 @@ def app(d_vars: dict, config: dict) -> None:
     }
     
     while True:
-        for s_path in config['PATHS'].split(','):
+        for s_path in [s.strip() for s in config['PATHS'].split(',')]:
             s_msgfile_prefix = MSGDIR + '/' + PROGNAME
             if os.path.basename(s_path):
                 s_msgfile_prefix += s_path.replace('/', '-')

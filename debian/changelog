@@ -1,3 +1,9 @@
+diskpatrol (0.2.1-1) unstable; urgency=medium
+
+  * Fix: add strip for each path in PATHS variable
+
+ -- Heechul Kim <jijisa@iorchard.net>  Fri, 15 Sep 2023 18:18:57 +0900
+
 diskpatrol (0.2.0-1) unstable; urgency=medium
 
   * Initial release
